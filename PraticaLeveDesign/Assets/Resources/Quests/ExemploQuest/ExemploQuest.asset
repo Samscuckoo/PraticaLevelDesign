@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85f706d957788094483ecab10570cd1b, type: 3}
   m_Name: ExemploQuest
   m_EditorClassIdentifier: Assembly-CSharp::QuestInfoSO
-  <id>k__BackingField: 
-  displayName: 
+  <id>k__BackingField: ExemploQuest
+  displayName: "Esse Nome N\xE3o Importa"
   levelRequirement: 0
   questPrerequisites: []
-  questStepPrefabs: []
+  questStepPrefabs:
+  - {fileID: 7995406874510362326, guid: e6245c4581d08c148b66c6b32a68810b, type: 3}
   goldReward: 0
   experienceReward: 0

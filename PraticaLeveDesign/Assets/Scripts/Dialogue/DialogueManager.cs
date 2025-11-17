@@ -2,19 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ink.Runtime;
+using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
     [Header("Ink Story")]
     [SerializeField] private TextAsset inkJson;
+    [SerializeField] private TextMeshProUGUI displayNameText;
+    [SerializeField] Animator portraitAnimator;
 
     private Story story;
     private int currentChoiceIndex = -1;
 
-    private bool dialoguePlaying = false;
+    public bool dialoguePlaying = false;
 
     private InkExternalFunctions inkExternalFunctions;
     private InkDialogueVariables inkDialogueVariables;
+
+    private const string SPEAKER_TAG = "speaker";
+    private const string PORTRAIT_TAG = "portrait";
 
     private void Awake() 
     {
@@ -108,6 +114,9 @@ public class DialogueManager : MonoBehaviour
         // start listening for variables
         inkDialogueVariables.SyncVariablesAndStartListening(story);
 
+        displayNameText.text = "???";
+        portraitAnimator.Play("Default");
+
         // kick off the story
         ContinueOrExitStory();
     }
@@ -141,11 +150,44 @@ public class DialogueManager : MonoBehaviour
             else 
             {
                 GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
+                HandleTags(story.currentTags);
+
             }
         }
         else if (story.currentChoices.Count == 0)
         {
             ExitDialogue();
+        }
+    }
+
+    private void HandleTags(List<string> tags)
+    {
+
+        // Debug.Log($"Handling {tags.Count} tags.");
+        foreach (string tag in tags)
+        {
+            string[] splitTag = tag.Split(':');
+            if (splitTag.Length != 2)
+            {
+                Debug.LogWarning($"Invalid tag format: {tag}");
+                continue;
+            }
+
+            string tagKey = splitTag[0].Trim();
+            string tagValue = splitTag[1].Trim();
+
+            switch (tagKey)
+            {
+                case SPEAKER_TAG:
+                    displayNameText.text = tagValue;
+                    break;
+                case PORTRAIT_TAG:
+                    portraitAnimator.Play(tagValue);
+                    break;
+                default:
+                    Debug.LogWarning($"Unhandled tag key: {tagKey}");
+                    break;
+            }
         }
     }
 
