@@ -36,7 +36,7 @@ Aqui você escreve sua quest normal. Se tiver escolhas, faz com símbolo Mais (+
     #speaker: Zézin Poggers
     #portrait: ExemploGira
     Mas você tem que redirecionar depois de cada escolha, parça. Pode ser pro mesmo lugar ou pra lugar diferente.
-    Depois, cê tem que chamar a função pra startar a quest passando o ID. Por isso a variavel la em cima. Demoro?
+    Depois, cê tem que chamar a função pra startar a quest passando o ID. Por isso a variavel la em cima. Demoro?#portrait:CavaleroDeCosta
     ~StartQuest(ExemploQuestId)
     -> okToGo
 + [NUM INTENDI]
@@ -52,6 +52,7 @@ Aqui você escreve sua quest normal. Se tiver escolhas, faz com símbolo Mais (+
     
 
 =okToGo
+
 Agora que cê entendeu como escrever uma quest, passa atrás do pilar pra mim.
 ->END
 
