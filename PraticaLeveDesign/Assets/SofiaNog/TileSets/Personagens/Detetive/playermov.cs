@@ -21,6 +21,9 @@ public class playermov : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
+        // IMPORTANTE: Normalizar evita que andar na diagonal seja mais rápido
+        movement = movement.normalized;
+
         // Envia valores para as animações
         anim.SetFloat("Horizontal", movement.x);
         anim.SetFloat("Vertical", movement.y);
@@ -29,7 +32,11 @@ public class playermov : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Movimento usando o Rigidbody2D
-        rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+        // Mover usando VELOCIDADE respeita os colliders e a física
+        // Se estiver usando Unity 6 (novo):
+        rb.linearVelocity = movement * speed;
+
+        // Se der erro vermelho no 'linearVelocity', use o antigo:
+        // rb.velocity = movement * speed;
     }
 }

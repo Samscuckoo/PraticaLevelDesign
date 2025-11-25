@@ -126,4 +126,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481e5dfd0721d484ea0a7b65dd898719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::playermov
-  speed: 5
+  speed: 0.06
