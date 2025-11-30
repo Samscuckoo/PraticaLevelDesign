@@ -36,16 +36,18 @@ public abstract class QuestStep : MonoBehaviour
         }
     }
 
-    
+
     protected void ChangeState(string newState)
     {
+        if (questId == null) return;
+
         if (GameEventsManager.instance != null)
         {
             GameEventsManager.instance.questEvents.QuestStepStateChange(questId, stepIndex, new QuestStepState(newState));
         }
     }
 
-    
+
     protected void ChangeState(string newState, string newStatusDescription)
     {
     
