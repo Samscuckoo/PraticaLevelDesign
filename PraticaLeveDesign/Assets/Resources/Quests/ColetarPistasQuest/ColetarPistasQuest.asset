@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Colete as Pistas!
   levelRequirement: 0
   questPrerequisites: []
-  questStepPrefabs: []
+  questStepPrefabs:
+  - {fileID: 1537588286293724308, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
   goldReward: 0
   experienceReward: 0

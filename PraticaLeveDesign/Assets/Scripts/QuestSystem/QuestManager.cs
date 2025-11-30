@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,12 +68,22 @@ public class QuestManager : MonoBehaviour
 
     private bool CheckRequirementsMet(Quest quest)
     {
-        // start true and prove to be false
         bool meetsRequirements = true;
+
+        // DEBUG: Vamos ver o que ele está comparando
+        if (quest.info.id == "ColetarPistasQuest") // Coloque aqui o ID da sua quest se for diferente
+        {
+            Debug.Log($"[Checando Requisitos] Quest: {quest.info.id}");
+            Debug.Log($"-- Nível do Player: {currentPlayerLevel}");
+            Debug.Log($"-- Nível Necessário: {quest.info.levelRequirement}");
+        }
 
         // check player level requirements
         if (currentPlayerLevel < quest.info.levelRequirement)
         {
+            if (quest.info.id == "ColetarPistasQuest")
+                Debug.Log("-- ❌ FALHOU: Nível do player é menor que o necessário.");
+
             meetsRequirements = false;
         }
 
@@ -82,19 +92,30 @@ public class QuestManager : MonoBehaviour
         {
             if (GetQuestById(prerequisiteQuestInfo.id).state != QuestState.FINISHED)
             {
+                if (quest.info.id == "ColetarPistasQuest")
+                    Debug.Log("-- ❌ FALHOU: Pré-requisito não atendido: " + prerequisiteQuestInfo.id);
+
                 meetsRequirements = false;
             }
         }
+
+        if (quest.info.id == "ColetarPistasQuest" && meetsRequirements)
+            Debug.Log("-- ✅ SUCESSO: Todos os requisitos atendidos!");
 
         return meetsRequirements;
     }
 
     private void Update()
     {
-        // loop through ALL quests
+       
         foreach (Quest quest in questMap.Values)
         {
-            // if we're now meeting the requirements, switch over to the CAN_START state
+            if (quest == null)
+            {
+                continue;
+            }
+
+            
             if (quest.state == QuestState.REQUIREMENTS_NOT_MET && CheckRequirementsMet(quest))
             {
                 ChangeQuestState(quest.info.id, QuestState.CAN_START);

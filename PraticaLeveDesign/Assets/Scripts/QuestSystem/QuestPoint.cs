@@ -1,13 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(CircleCollider2D))]
 public class QuestPoint : MonoBehaviour
 {
-    [Header("Dialogue (optional)")]
-    [SerializeField] private string dialogueKnotName;
-
     [Header("Quest")]
     [SerializeField] private QuestInfoSO questInfoForPoint;
 
@@ -18,10 +13,9 @@ public class QuestPoint : MonoBehaviour
     private bool playerIsNear = false;
     private string questId;
     private QuestState currentQuestState;
-
     private QuestIcon questIcon;
 
-    private void Awake() 
+    private void Awake()
     {
         questId = questInfoForPoint.id;
         questIcon = GetComponentInChildren<QuestIcon>();
@@ -30,64 +24,80 @@ public class QuestPoint : MonoBehaviour
     private void OnEnable()
     {
         GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
-        GameEventsManager.instance.inputEvents.onSubmitPressed += SubmitPressed;
     }
 
     private void OnDisable()
     {
         GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
-        GameEventsManager.instance.inputEvents.onSubmitPressed -= SubmitPressed;
     }
 
-    private void SubmitPressed(InputEventContext inputEventContext)
+    private void Update()
     {
-        if (!playerIsNear || !inputEventContext.Equals(InputEventContext.DEFAULT))
+        // DEBUG: Se apertar E, conta tudo o que sabe
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            return;
-        }
+            Debug.Log("--- TESTE DE INTERAÇÃO ---");
+            Debug.Log("1. Tecla E reconhecida.");
+            Debug.Log("2. Player está perto? " + playerIsNear);
+            Debug.Log("3. Estado da Quest: " + currentQuestState);
+            Debug.Log("4. É StartPoint? " + startPoint);
 
-        // if we have a knot name defined, try to start dialogue with it
-        if (!dialogueKnotName.Equals("")) 
-        {
-            GameEventsManager.instance.dialogueEvents.EnterDialogue(dialogueKnotName);
+            if (playerIsNear)
+            {
+                Interact();
+            }
+            else
+            {
+                Debug.LogWarning("❌ O Player não está perto o suficiente (playerIsNear = false).");
+            }
         }
-        // otherwise, start or finish the quest immediately without dialogue
-        else 
+    }
+
+    private void Interact()
+    {
+        // Tenta INICIAR a quest
+        if (currentQuestState == QuestState.CAN_START && startPoint)
         {
-            // start or finish a quest
-            if (currentQuestState.Equals(QuestState.CAN_START) && startPoint)
-            {
-                GameEventsManager.instance.questEvents.StartQuest(questId);
-            }
-            else if (currentQuestState.Equals(QuestState.CAN_FINISH) && finishPoint)
-            {
-                GameEventsManager.instance.questEvents.FinishQuest(questId);
-            }
+            Debug.Log("✅ TENTANDO INICIAR A QUEST!");
+            GameEventsManager.instance.questEvents.StartQuest(questId);
+        }
+        // Tenta FINALIZAR a quest
+        else if (currentQuestState == QuestState.CAN_FINISH && finishPoint)
+        {
+            Debug.Log("✅ TENTANDO FINALIZAR A QUEST!");
+            GameEventsManager.instance.questEvents.FinishQuest(questId);
+        }
+        else
+        {
+            Debug.LogError("❌ Ação negada! Motivo provável: O Estado da Quest não permite.");
+            Debug.Log("Esperado: CAN_START ou CAN_FINISH. Encontrado: " + currentQuestState);
         }
     }
 
     private void QuestStateChange(Quest quest)
     {
-        // only update the quest state if this point has the corresponding quest
         if (quest.info.id.Equals(questId))
         {
             currentQuestState = quest.state;
+            Debug.Log("O Estado da Quest mudou para: " + currentQuestState);
             questIcon.SetState(currentQuestState, startPoint, finishPoint);
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D otherCollider)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (otherCollider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
+            Debug.Log("🦶 Player ENTROU no Trigger.");
             playerIsNear = true;
         }
     }
 
-    private void OnTriggerExit2D(Collider2D otherCollider)
+    private void OnTriggerExit2D(Collider2D other)
     {
-        if (otherCollider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
+            Debug.Log("👋 Player SAIU do Trigger.");
             playerIsNear = false;
         }
     }

@@ -83,7 +83,7 @@ public class Quest
         if (stepIndex < questStepStates.Length)
         {
             questStepStates[stepIndex].state = questStepState.state;
-            questStepStates[stepIndex].status = questStepState.status;
+            questStepStates[stepIndex].state = questStepState.state;
         }
         else 
         {
@@ -114,12 +114,12 @@ public class Quest
             // display all previous quests with strikethroughs
             for (int i = 0; i < currentQuestStepIndex; i++)
             {
-                fullStatus += "<s>" + questStepStates[i].status + "</s>\n";
+                fullStatus += "<s>" + questStepStates[i].state + "</s>\n";
             }
             // display the current step, if it exists
             if (CurrentStepExists())
             {
-                fullStatus += questStepStates[currentQuestStepIndex].status;
+                fullStatus += questStepStates[currentQuestStepIndex].state;
             }
             // when the quest is completed or turned in
             if (state == QuestState.CAN_FINISH)

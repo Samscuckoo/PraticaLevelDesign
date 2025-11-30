@@ -199,6 +199,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.03
       objectReference: {fileID: 0}
+    - target: {fileID: 5490567910801114808, guid: 073372f0f14ce814aa45bf21c04e7372, type: 3}
+      propertyPath: questInfoForPoint
+      value: 
+      objectReference: {fileID: 11400000, guid: b02bd9de0fd7e4148b577c61e167cc4b, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -584,6 +588,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8aa9c88292fc7214fb2f21ff7fcd3daa, type: 3}
+--- !u!1 &841337997
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 841337999}
+  - component: {fileID: 841337998}
+  m_Layer: 0
+  m_Name: GameEventsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &841337998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841337997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69e8a40a38f16f42beccf4fc86c70e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameEventsManager
+--- !u!4 &841337999
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841337997}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.9026, y: -3.75579, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &915056530
 GameObject:
   m_ObjectHideFlags: 0
@@ -13588,6 +13636,51 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &1461091281
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1461091283}
+  - component: {fileID: 1461091282}
+  m_Layer: 0
+  m_Name: QuestManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1461091282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461091281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3da4e653378230c43a5d8d173b66662e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestManager
+  loadQuestState: 1
+--- !u!4 &1461091283
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461091281}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.9026, y: -3.75579, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1535765092 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7316551383122377885, guid: 8aa9c88292fc7214fb2f21ff7fcd3daa, type: 3}
@@ -25707,63 +25800,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1001 &1819327623
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3.44331
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -4.08523
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1156399407546670820, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1537588286293724308, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
-      propertyPath: m_Name
-      value: ColetarPistasQuest
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d2cc9254f43dcd946a8cabb487807f7d, type: 3}
 --- !u!1 &2046279771
 GameObject:
   m_ObjectHideFlags: 0
@@ -30791,4 +30827,5 @@ SceneRoots:
   - {fileID: 8297409065088447578}
   - {fileID: 128073180}
   - {fileID: 244517893}
-  - {fileID: 1819327623}
+  - {fileID: 841337999}
+  - {fileID: 1461091283}
