@@ -2,22 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoneyPickup : MonoBehaviour
+// Renomeado para refletir o item que ele representa
+public class PistaPickup : MonoBehaviour
 {
-    public int cashValue = 1;
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Player")
+        // 1. Verifica se quem entrou na colisão é o Player (confira a Tag no Unity!)
+        if (other.CompareTag("Player"))
         {
-            IInventory inventory = other.GetComponent<IInventory>();
-
-            if (inventory != null)
+            // 2. DISPARA o evento no GameEventsManager, chamando o método PistaCollected()
+            // Isso notifica o ColetarPistasQuestStep
+            if (GameEventsManager.instance != null && GameEventsManager.instance.miscEvents != null)
             {
-                inventory.Money = inventory.Money + cashValue;
-                print("Player inventory has " + inventory.Money + " money in it.");
-                gameObject.SetActive(false);
+                GameEventsManager.instance.miscEvents.PistaCollected();
             }
+            else
+            {
+                Debug.LogError("GameEventsManager ou MiscEvents não está acessível! A pista não foi registrada.");
+            }
+
+            // 3. Destrói ou desativa o objeto coletável
+            gameObject.SetActive(false);
+            // Se preferir, use: Destroy(gameObject);
         }
     }
 }

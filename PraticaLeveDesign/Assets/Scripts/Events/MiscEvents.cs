@@ -2,21 +2,31 @@ using System;
 
 public class MiscEvents
 {
-    public event Action onCoinCollected;
-    public void CoinCollected() 
+    // =========================================================
+    // EVENTOS DE PISTA
+    // =========================================================
+    // A Action (o "on") que o QuestStep assina
+    public event Action onPistaCollected;
+
+    // O método que o PistaPickup chama para disparar o evento
+    public void PistaCollected()
     {
-        if (onCoinCollected != null) 
-        {
-            onCoinCollected();
-        }
+        // Dispara o evento, notificando todos os ouvintes.
+        onPistaCollected?.Invoke();
+    }
+
+    // =========================================================
+    // OUTROS EVENTOS (Mantidos como exemplo)
+    // =========================================================
+    public event Action onCoinCollected;
+    public void CoinCollected()
+    {
+        onCoinCollected?.Invoke();
     }
 
     public event Action onGemCollected;
-    public void GemCollected() 
+    public void GemCollected()
     {
-        if (onGemCollected != null) 
-        {
-            onGemCollected();
-        }
+        onGemCollected?.Invoke();
     }
 }
