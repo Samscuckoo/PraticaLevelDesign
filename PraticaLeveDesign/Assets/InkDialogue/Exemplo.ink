@@ -25,40 +25,38 @@ O nome das partes do nó só afetam dentro do nó, mas o nome tem que ser igual.
 ->END
 
 =caboQuest
-"Cê já fez a quest!"
+Agradeço novamente por retornar o artefato.
 ->END
 
 =canStart
 #portrait:ExemploBase
-#speaker: Zézin Tutoriais
-Aqui você escreve sua quest normal. Se tiver escolhas, faz com símbolo Mais (+) e colchetes. Estrela + colchetes significa que a escolha é única. Isso não muda muita coisa.
+#speaker: Guarda da cidade
+Guardião do templo, bandidos roubaram o artefato sagrado do templo, por favor, você deve recuperar o artefato que foi roubado pelos bandidos 
 * [ENTENDI!]
-    #speaker: Zézin Poggers
+    #speaker: Guarda da cidade
     #portrait: ExemploGira
-    Mas você tem que redirecionar depois de cada escolha, parça. Pode ser pro mesmo lugar ou pra lugar diferente.
-    Depois, cê tem que chamar a função pra startar a quest passando o ID. Por isso a variavel la em cima. Demoro?
+    O artefato se encontra no acampanento dos bandidos ao sul daqui. Você irá encontrar o artefato dentro da casa do líder deles, que é a casa de madeira.
     ~StartQuest(ExemploQuestId)
     -> okToGo
-+ [NUM INTENDI]
-#speaker: Zézin Bravo
++ [Não entendi]
+#speaker: Guarda da cidade
 #portrait: Exemplo2
-    Então vamo tentar denovo...
+    Deixe-me explicar a situação novamente...
     ->canStart
-*[NUM INTENDI COM ESTRELA]
-#speaker: Zézin Paciente
+*[Onde exatamente está a reliquia?]
+#speaker: Guarda da cidade
 #portrait:AnimaçãoExemplo
-    Então vamo tentar denovo, mas essa opção vai sumir agora.
+    Ele se encontra na casa do líder dos bandidos, uma casa grande feita de madeira.
     ->canStart
     
 
 =okToGo
 #portrait:CavaleroDeCosta
-Agora que cê entendeu como escrever uma quest, passa atrás do pilar pra mim.
+Após recuperar o artefato coloque-o de volta no templo ao norte e depois venha falar comigo, boa sorte.
 ->END
 
 =entregaQuest
-"MILAGREEE O GD SABE SEGUIR ORDENS"
-Só não esquece de finalizar a quest.
+Muito obrgado por retornar o artefato!
 ~FinishQuest(ExemploQuestId)
 ->END
 
