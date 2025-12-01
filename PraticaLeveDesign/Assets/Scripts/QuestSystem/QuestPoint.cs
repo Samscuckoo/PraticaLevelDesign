@@ -41,37 +41,41 @@ public class QuestPoint : MonoBehaviour
     }
 
     private void Update()
+{
+    // Se apertar E, me avise!
+    if (Input.GetKeyDown(KeyCode.E))
     {
-        // Se apertar E, me avise!
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Debug.Log("APERTEI E! Perto: " + playerIsNear + " | Estado: " + currentQuestState);
+        Debug.Log("[QuestPoint] APERTEI E! Perto: " + playerIsNear + " | Estado: " + currentQuestState);
 
-            if (playerIsNear)
-            {
-                Interact();
-            }
+        if (playerIsNear)
+        {
+            Interact();
         }
     }
+}
 
-    private void Interact()
+private void Interact()
+{
+    Debug.Log("[QuestPoint] Interact() chamado. dialogueKnotName = '" + dialogueKnotName + "'. GameEventsManager.instance = " + (GameEventsManager.instance != null));
+
+    if (!string.IsNullOrEmpty(dialogueKnotName))
     {
-        if (!string.IsNullOrEmpty(dialogueKnotName))
+        Debug.Log("[QuestPoint] Chamando dialogueEvents.EnterDialogue -> " + dialogueKnotName);
+        GameEventsManager.instance.dialogueEvents.EnterDialogue(dialogueKnotName);
+    }
+    else
+    {
+        Debug.Log("[QuestPoint] Sem dialogueKnotName, tentando quest logic...");
+        if (currentQuestState == QuestState.CAN_START && startPoint)
         {
-            GameEventsManager.instance.dialogueEvents.EnterDialogue(dialogueKnotName);
+            GameEventsManager.instance.questEvents.StartQuest(questId);
         }
-        else
+        else if (currentQuestState == QuestState.CAN_FINISH && finishPoint)
         {
-            if (currentQuestState == QuestState.CAN_START && startPoint)
-            {
-                GameEventsManager.instance.questEvents.StartQuest(questId);
-            }
-            else if (currentQuestState == QuestState.CAN_FINISH && finishPoint)
-            {
-                GameEventsManager.instance.questEvents.FinishQuest(questId);
-            }
+            GameEventsManager.instance.questEvents.FinishQuest(questId);
         }
     }
+}
 
     private void QuestStateChange(Quest quest)
     {

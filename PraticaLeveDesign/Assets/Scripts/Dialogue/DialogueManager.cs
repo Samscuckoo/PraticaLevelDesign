@@ -31,8 +31,16 @@ public class DialogueManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log("DialogueManager ON - Registrando evento de diálogo...");
+        Debug.Log("DialogueManager ON - tentando registrar evento onEnterDialogue...");
+
+        if (GameEventsManager.instance == null)
+        {
+            Debug.LogError("DialogueManager: GameEventsManager.instance está NULL no OnEnable!");
+            return;
+        }
+
         GameEventsManager.instance.dialogueEvents.onEnterDialogue += EnterDialogue;
+        Debug.Log("DialogueManager ON - registro feito.");
     }
 
     private void OnDisable()
@@ -49,7 +57,14 @@ public class DialogueManager : MonoBehaviour
             Input.GetKeyDown(KeyCode.Space) ||
             Input.GetMouseButtonDown(0))
         {
-            ContinueOrExitStory();
+            // 🔥 Se não pode continuar e não há escolhas, significa que ACABOU.
+            if (!story.canContinue && story.currentChoices.Count == 0)
+            {
+                ExitDialogue();
+                return;
+            }
+
+            ContinueStory();
         }
     }
 
@@ -72,30 +87,34 @@ public class DialogueManager : MonoBehaviour
             catch { Debug.LogError("Erro no nó: " + knotName); }
         }
 
-        ContinueOrExitStory();
+        // Mostra a PRIMEIRA fala
+        ContinueStory();
     }
 
-    private void ContinueOrExitStory()
+    private void ContinueStory()
     {
         if (story.canContinue)
         {
-            string text = story.Continue();
+            string text = story.Continue().Trim();
 
+            // Evita falas vazias pularem automaticamente
             while (string.IsNullOrWhiteSpace(text) && story.canContinue)
-                text = story.Continue();
+                text = story.Continue().Trim();
 
             GameEventsManager.instance.dialogueEvents.DisplayDialogue(text, story.currentChoices);
 
             HandleTags(story.currentTags);
+            return;
         }
-        else if (story.currentChoices.Count > 0)
+
+        // Se já não tem continue mas tem escolhas
+        if (story.currentChoices.Count > 0)
         {
             GameEventsManager.instance.dialogueEvents.DisplayDialogue("", story.currentChoices);
         }
-        else
-        {
-            ExitDialogue();
-        }
+
+        // 🔥 Note que NÃO chamamos ExitDialogue aqui
+        // Esperamos o jogador apertar uma tecla — lógica no Update()
     }
 
     private void HandleTags(List<string> tags)

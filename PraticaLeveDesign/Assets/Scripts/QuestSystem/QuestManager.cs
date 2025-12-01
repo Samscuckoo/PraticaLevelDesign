@@ -17,55 +17,91 @@ public class QuestManager : MonoBehaviour
         questMap = CreateQuestMap();
     }
 
-    private void OnEnable()
+    private IEnumerator Start()
     {
-        GameEventsManager.instance.questEvents.onStartQuest += StartQuest;
-        GameEventsManager.instance.questEvents.onAdvanceQuest += AdvanceQuest;
-        GameEventsManager.instance.questEvents.onFinishQuest += FinishQuest;
-        GameEventsManager.instance.questEvents.onQuestStepStateChange += QuestStepStateChange;
-        GameEventsManager.instance.playerEvents.onPlayerLevelChange += PlayerLevelChange;
-    }
+        // Espera o GameEventsManager inicializar (proteção contra ordem de execução)
+        yield return StartCoroutine(WaitForGameEventsManager());
 
-    private void OnDisable()
-    {
-        GameEventsManager.instance.questEvents.onStartQuest -= StartQuest;
-        GameEventsManager.instance.questEvents.onAdvanceQuest -= AdvanceQuest;
-        GameEventsManager.instance.questEvents.onFinishQuest -= FinishQuest;
-        GameEventsManager.instance.questEvents.onQuestStepStateChange -= QuestStepStateChange;
-        GameEventsManager.instance.playerEvents.onPlayerLevelChange -= PlayerLevelChange;
-    }
+        // Registrando listeners com segurança
+        if (GameEventsManager.instance != null)
+        {
+            var gem = GameEventsManager.instance;
+            gem.questEvents.onStartQuest += StartQuest;
+            gem.questEvents.onAdvanceQuest += AdvanceQuest;
+            gem.questEvents.onFinishQuest += FinishQuest;
+            gem.questEvents.onQuestStepStateChange += QuestStepStateChange;
 
-    private void Start()
-    {
+            if (gem.playerEvents != null)
+                gem.playerEvents.onPlayerLevelChange += PlayerLevelChange;
+        }
+
+        // Inicializa quests que já estavam em andamento no save
         foreach (Quest quest in questMap.Values)
         {
-            // Inicializa quests que já estavam em andamento no save
+            if (quest == null) continue;
+
             if (quest.state == QuestState.IN_PROGRESS)
             {
                 quest.InstantiateCurrentQuestStep(this.transform);
             }
-            // Transmite o estado inicial de todas as quests
-            GameEventsManager.instance.questEvents.QuestStateChange(quest);
-        }
-    }
 
-    private void Update()
-    {
-        foreach (Quest quest in questMap.Values)
-        {
-            // Trava de segurança para evitar erros se a quest não carregou direito
-            if (quest == null) continue;
-
-            // Se agora atendemos os requisitos, muda o estado para CAN_START
-            if (quest.state == QuestState.REQUIREMENTS_NOT_MET && CheckRequirementsMet(quest))
+            // Transmite o estado inicial de todas as quests (se possível)
+            if (GameEventsManager.instance != null && GameEventsManager.instance.questEvents != null)
             {
-                ChangeQuestState(quest.info.id, QuestState.CAN_START);
+                GameEventsManager.instance.questEvents.QuestStateChange(quest);
             }
         }
     }
 
+    private IEnumerator WaitForGameEventsManager()
+    {
+        // espera até que GameEventsManager.instance exista (ou timeout)
+        float timeout = 5f;
+        float t = 0f;
+        while (GameEventsManager.instance == null && t < timeout)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        if (GameEventsManager.instance == null)
+        {
+            Debug.LogError("[QuestManager] Timeout esperando GameEventsManager.instance. Muitos sistemas dependerão disso.");
+        }
+        else
+        {
+            Debug.Log("[QuestManager] GameEventsManager encontrado no Start(). Registrando listeners.");
+        }
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe com checagens para evitar NREs na desativação
+        if (GameEventsManager.instance != null)
+        {
+            var gem = GameEventsManager.instance;
+            if (gem.questEvents != null)
+            {
+                gem.questEvents.onStartQuest -= StartQuest;
+                gem.questEvents.onAdvanceQuest -= AdvanceQuest;
+                gem.questEvents.onFinishQuest -= FinishQuest;
+                gem.questEvents.onQuestStepStateChange -= QuestStepStateChange;
+            }
+
+            if (gem.playerEvents != null)
+            {
+                gem.playerEvents.onPlayerLevelChange -= PlayerLevelChange;
+            }
+        }
+    }
+
+    // -------------------------
+    // Métodos públicos / lógica
+    // -------------------------
     private bool CheckRequirementsMet(Quest quest)
     {
+        if (quest == null) return false;
+
         bool meetsRequirements = true;
 
         if (currentPlayerLevel < quest.info.levelRequirement)
@@ -75,7 +111,8 @@ public class QuestManager : MonoBehaviour
 
         foreach (QuestInfoSO prerequisiteQuestInfo in quest.info.questPrerequisites)
         {
-            if (GetQuestById(prerequisiteQuestInfo.id).state != QuestState.FINISHED)
+            Quest prereq = GetQuestByIdSafe(prerequisiteQuestInfo.id);
+            if (prereq == null || prereq.state != QuestState.FINISHED)
             {
                 meetsRequirements = false;
             }
@@ -86,9 +123,19 @@ public class QuestManager : MonoBehaviour
 
     private void ChangeQuestState(string id, QuestState state)
     {
-        Quest quest = GetQuestById(id);
+        Quest quest = GetQuestByIdSafe(id);
+        if (quest == null)
+        {
+            Debug.LogWarning("[QuestManager] ChangeQuestState: quest não encontrada: " + id);
+            return;
+        }
+
         quest.state = state;
-        GameEventsManager.instance.questEvents.QuestStateChange(quest);
+
+        if (GameEventsManager.instance != null && GameEventsManager.instance.questEvents != null)
+        {
+            GameEventsManager.instance.questEvents.QuestStateChange(quest);
+        }
     }
 
     private void PlayerLevelChange(int level)
@@ -98,14 +145,26 @@ public class QuestManager : MonoBehaviour
 
     private void StartQuest(string id)
     {
-        Quest quest = GetQuestById(id);
+        Quest quest = GetQuestByIdSafe(id);
+        if (quest == null)
+        {
+            Debug.LogWarning("[QuestManager] StartQuest: quest não encontrada: " + id);
+            return;
+        }
+
         quest.InstantiateCurrentQuestStep(this.transform);
         ChangeQuestState(quest.info.id, QuestState.IN_PROGRESS);
     }
 
     private void AdvanceQuest(string id)
     {
-        Quest quest = GetQuestById(id);
+        Quest quest = GetQuestByIdSafe(id);
+        if (quest == null)
+        {
+            Debug.LogWarning("[QuestManager] AdvanceQuest: quest não encontrada: " + id);
+            return;
+        }
+
         quest.MoveToNextStep();
 
         if (quest.CurrentStepExists())
@@ -120,24 +179,45 @@ public class QuestManager : MonoBehaviour
 
     private void FinishQuest(string id)
     {
-        Quest quest = GetQuestById(id);
+        Quest quest = GetQuestByIdSafe(id);
+        if (quest == null)
+        {
+            Debug.LogWarning("[QuestManager] FinishQuest: quest não encontrada: " + id);
+            return;
+        }
+
         ClaimRewards(quest);
         ChangeQuestState(quest.info.id, QuestState.FINISHED);
     }
 
     private void ClaimRewards(Quest quest)
     {
-        GameEventsManager.instance.goldEvents.GoldGained(quest.info.goldReward);
-        GameEventsManager.instance.playerEvents.ExperienceGained(quest.info.experienceReward);
+        if (GameEventsManager.instance != null)
+        {
+            if (GameEventsManager.instance.goldEvents != null)
+                GameEventsManager.instance.goldEvents.GoldGained(quest.info.goldReward);
+
+            if (GameEventsManager.instance.playerEvents != null)
+                GameEventsManager.instance.playerEvents.ExperienceGained(quest.info.experienceReward);
+        }
     }
 
     private void QuestStepStateChange(string id, int stepIndex, QuestStepState questStepState)
     {
-        Quest quest = GetQuestById(id);
+        Quest quest = GetQuestByIdSafe(id);
+        if (quest == null)
+        {
+            Debug.LogWarning("[QuestManager] QuestStepStateChange: quest não encontrada: " + id);
+            return;
+        }
+
         quest.StoreQuestStepState(questStepState, stepIndex);
         ChangeQuestState(id, quest.state);
     }
 
+    // -------------------------
+    // Helpers: criação / busca
+    // -------------------------
     private Dictionary<string, Quest> CreateQuestMap()
     {
         QuestInfoSO[] allQuests = Resources.LoadAll<QuestInfoSO>("Quests");
@@ -153,18 +233,35 @@ public class QuestManager : MonoBehaviour
         return idToQuestMap;
     }
 
-    private Quest GetQuestById(string id)
+    private Quest GetQuestByIdSafe(string id)
     {
-        Quest quest = questMap[id];
-        if (quest == null)
+        if (string.IsNullOrEmpty(id))
         {
-            Debug.LogError("ID not found in the Quest Map: " + id);
+            Debug.LogWarning("[QuestManager] GetQuestByIdSafe called with null/empty id.");
+            return null;
         }
+
+        if (questMap == null)
+        {
+            Debug.LogWarning("[QuestManager] questMap é null!");
+            return null;
+        }
+
+        if (!questMap.TryGetValue(id, out Quest quest))
+        {
+            Debug.LogWarning("[QuestManager] ID not found in the Quest Map: " + id);
+            return null;
+        }
+
         return quest;
     }
 
+    // -------------------------
+    // Save / Load
+    // -------------------------
     private void OnApplicationQuit()
     {
+        if (questMap == null) return;
         foreach (Quest quest in questMap.Values)
         {
             SaveQuest(quest);
@@ -173,6 +270,8 @@ public class QuestManager : MonoBehaviour
 
     private void SaveQuest(Quest quest)
     {
+        if (quest == null) return;
+
         try
         {
             QuestData questData = quest.GetQuestData();
