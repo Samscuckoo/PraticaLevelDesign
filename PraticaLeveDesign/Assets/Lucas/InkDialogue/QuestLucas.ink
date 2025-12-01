@@ -1,7 +1,3 @@
-EXTERNAL StartQuest(questId)
-EXTERNAL AdvanceQuest(questId)
-EXTERNAL FinishQuest(questId)
-
 VAR OrbesQuestId = "ExemploQuest"
 VAR OrbesColetadas = 0
 
@@ -21,8 +17,6 @@ VAR ExemploQuestState = "REQUIREMENTS_NOT_MET"
 -> END
 
 =dialogoInicial
-#portrait:Sapo
-#speaker:Sapo Estranho
 "Olá, jovem esqueleto. Bem-vindo ao nosso vilarejo."
 "Como pode ver, não tem mais ninguém além de mim."
 "..."
@@ -32,15 +26,11 @@ VAR ExemploQuestState = "REQUIREMENTS_NOT_MET"
 "Será que você não os traria até mim?"
 
 * [ACEITAR AJUDAR]
-    #portrait:Sapo
-    #speaker:Sapo Estranho
     "Ah! Sabia que você tinha ossos bondosos."
     ~StartQuest(OrbesQuestId)
     -> END
 
 + [RECUSAR]
-    #portrait:Sapo
-    #speaker:Sapo Estranho
     "O tédio também escolhe suas vítimas."
     -> END
 
@@ -53,8 +43,6 @@ VAR ExemploQuestState = "REQUIREMENTS_NOT_MET"
 }
 
 =questEmAndamento
-#portrait:Sapo
-#speaker:Sapo Entediado
 "Como tenho tédio."
 -> END
 
@@ -67,8 +55,6 @@ VAR ExemploQuestState = "REQUIREMENTS_NOT_MET"
 }
 
 =dialogoFinal
-#portrait:Sapo
-#speaker:Sapo Sábio
 "Ora..."
 "Parece que eles não estão mais aqui."
 "Me deprime a vida do que não se mexe."
@@ -77,7 +63,5 @@ VAR ExemploQuestState = "REQUIREMENTS_NOT_MET"
 -> END
 
 =falaPadrao
-#portrait:Sapo
-#speaker:Estátua
 "..."
 -> END
