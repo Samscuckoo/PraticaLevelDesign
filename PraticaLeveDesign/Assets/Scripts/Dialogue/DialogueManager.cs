@@ -6,155 +6,129 @@ using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
-    [Header("Ink Story")]
+    [Header("Configuração")]
     [SerializeField] private TextAsset inkJson;
-    [SerializeField] private TextMeshProUGUI displayNameText;
-    [SerializeField] Animator portraitAnimator;
+    
+    [Header("UI (Arraste aqui!)")]
+    [SerializeField] private GameObject dialoguePanel;      
+    [SerializeField] private TextMeshProUGUI dialogueText;  
+    [SerializeField] private TextMeshProUGUI displayNameText; 
+    [SerializeField] private Animator portraitAnimator;     
 
     private Story story;
-    private int currentChoiceIndex = -1;
+    private bool dialoguePlaying = false;
 
-    public bool dialoguePlaying = false;
-
+    // --- SEUS SCRIPTS AUXILIARES ---
     private InkExternalFunctions inkExternalFunctions;
     private InkDialogueVariables inkDialogueVariables;
+    // -------------------------------
 
     private const string SPEAKER_TAG = "speaker";
     private const string PORTRAIT_TAG = "portrait";
 
     private void Awake() 
     {
-        story = new Story(inkJson.text);
-        inkExternalFunctions = new InkExternalFunctions();
-        inkExternalFunctions.Bind(story);
-        inkDialogueVariables = new InkDialogueVariables(story);
-    }
+        if (inkJson != null)
+        {
+            // Inicializa seus scripts auxiliares
+            inkExternalFunctions = new InkExternalFunctions();
+            // Precisamos criar a história aqui para passar para o DialogueVariables
+            story = new Story(inkJson.text);
+            inkDialogueVariables = new InkDialogueVariables(story); 
+        }
+        else
+        {
+            Debug.LogError("⚠️ FALTANDO ARQUIVO: Arraste o 'Main.json' para o campo Ink Json no Inspector!");
+        }
 
-    private void OnDestroy() 
-    {
-        inkExternalFunctions.Unbind(story);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false); 
     }
 
     private void OnEnable() 
     {
         GameEventsManager.instance.dialogueEvents.onEnterDialogue += EnterDialogue;
-        GameEventsManager.instance.inputEvents.onSubmitPressed += SubmitPressed;
-        GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex += UpdateChoiceIndex;
-        GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable += UpdateInkDialogueVariable;
-        GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
     }
 
     private void OnDisable() 
     {
-        GameEventsManager.instance.dialogueEvents.onEnterDialogue -= EnterDialogue;
-        GameEventsManager.instance.inputEvents.onSubmitPressed -= SubmitPressed;
-        GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex -= UpdateChoiceIndex;
-        GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable -= UpdateInkDialogueVariable;
-        GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
-    }
-
-    private void QuestStateChange(Quest quest) 
-    {
-        GameEventsManager.instance.dialogueEvents.UpdateInkDialogueVariable(
-            quest.info.id + "State",
-            new StringValue(quest.state.ToString())
-        );
-    }
-
-    private void UpdateInkDialogueVariable(string name, Ink.Runtime.Object value) 
-    {
-        inkDialogueVariables.UpdateVariableState(name, value);
-    }
-
-    private void UpdateChoiceIndex(int choiceIndex) 
-    {
-        this.currentChoiceIndex = choiceIndex;
-    }
-
-    private void SubmitPressed(InputEventContext inputEventContext) 
-    {
-        // if the context isn't dialogue, we never want to register input here
-        if (!inputEventContext.Equals(InputEventContext.DIALOGUE)) 
+        if (GameEventsManager.instance != null)
         {
-            return;
+            GameEventsManager.instance.dialogueEvents.onEnterDialogue -= EnterDialogue;
         }
+    }
 
-        ContinueOrExitStory();
+    private void Update()
+    {
+        if (!dialoguePlaying) return;
+
+        // Avança com E, Espaço ou Clique
+        if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        {
+            ContinueOrExitStory();
+        }
     }
 
     private void EnterDialogue(string knotName) 
     {
-        // don't enter dialogue if we've already entered
-        if (dialoguePlaying) 
-        {
-            return;
-        }
+        if (dialoguePlaying) return;
+
+        // Reinicia a história para garantir estado limpo
+        story = new Story(inkJson.text); 
+        
+        // --- USA SEUS SCRIPTS PARA CONECTAR ---
+        // Liga as funções (Quests) e Variáveis
+        // CORREÇÃO: Removido o segundo argumento que causava erro
+        inkExternalFunctions.Bind(story); 
+        
+        // CORREÇÃO: Usando o nome correto do método do seu script
+        inkDialogueVariables.SyncVariablesAndStartListening(story);             
+        // --------------------------------------
 
         dialoguePlaying = true;
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
 
-        // inform other parts of our system that we've started dialogue
-        GameEventsManager.instance.dialogueEvents.DialogueStarted();
+        // Tenta ir para o nó específico
+        if (!string.IsNullOrEmpty(knotName))
+        {
+            try {
+                story.ChoosePathString(knotName);
+            }
+            catch (System.Exception e) {
+                Debug.LogError("Erro ao ir para o nó: " + knotName + ". " + e.Message);
+            }
+        }
 
-        // freeze player movement
-        GameEventsManager.instance.playerEvents.DisablePlayerMovement();
-
-        // input event context
-        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DIALOGUE);
+        // Configurações iniciais
+        if (displayNameText != null) displayNameText.text = "???";
         
-        // jump to the knot
-        if (!knotName.Equals(""))
+        // PROTEÇÃO: Só tenta tocar animação se existir um Controlador no Animator
+        if (portraitAnimator != null && portraitAnimator.runtimeAnimatorController != null) 
         {
-            story.ChoosePathString(knotName);
-        }
-        else 
-        {
-            Debug.LogWarning("Knot name was the empty string when entering dialogue.");
+            portraitAnimator.Play("default");
         }
 
-        // start listening for variables
-        inkDialogueVariables.SyncVariablesAndStartListening(story);
-
-        displayNameText.text = "???";
-        portraitAnimator.Play("Default");
-
-        // kick off the story
         ContinueOrExitStory();
     }
 
     private void ContinueOrExitStory() 
     {
-        // make a choice, if applicable
-        if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
-        {
-            story.ChooseChoiceIndex(currentChoiceIndex);
-            // reset choice index for next time
-            currentChoiceIndex = -1;
-        }
-
         if (story.canContinue)
         {
-            string dialogueLine = story.Continue();
+            string textoAtual = story.Continue();
+            
+            // Pula linhas em branco se houver
+            if (string.IsNullOrWhiteSpace(textoAtual) && story.canContinue)
+            {
+                ContinueOrExitStory();
+                return;
+            }
 
-            // handle the case where there's an empty line of dialogue
-            // by continuing until we get a line with content
-            while (IsLineBlank(dialogueLine) && story.canContinue) 
-            {
-                dialogueLine = story.Continue();
-            }
-            // handle the case where the last line of dialogue is blank
-            // (empty choice, external function, etc...)
-            if (IsLineBlank(dialogueLine) && !story.canContinue) 
-            {
-                ExitDialogue();
-            }
-            else 
-            {
-                GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
-                HandleTags(story.currentTags);
+            // Atualiza a tela
+            if (dialogueText != null) dialogueText.text = textoAtual;
 
-            }
+            HandleTags(story.currentTags);
         }
-        else if (story.currentChoices.Count == 0)
+        else
         {
             ExitDialogue();
         }
@@ -162,16 +136,10 @@ public class DialogueManager : MonoBehaviour
 
     private void HandleTags(List<string> tags)
     {
-
-        // Debug.Log($"Handling {tags.Count} tags.");
         foreach (string tag in tags)
         {
             string[] splitTag = tag.Split(':');
-            if (splitTag.Length != 2)
-            {
-                Debug.LogWarning($"Invalid tag format: {tag}");
-                continue;
-            }
+            if (splitTag.Length != 2) continue;
 
             string tagKey = splitTag[0].Trim();
             string tagValue = splitTag[1].Trim();
@@ -179,13 +147,14 @@ public class DialogueManager : MonoBehaviour
             switch (tagKey)
             {
                 case SPEAKER_TAG:
-                    displayNameText.text = tagValue;
+                    if (displayNameText != null) displayNameText.text = tagValue;
                     break;
                 case PORTRAIT_TAG:
-                    portraitAnimator.Play(tagValue);
-                    break;
-                default:
-                    Debug.LogWarning($"Unhandled tag key: {tagKey}");
+                    // PROTEÇÃO: Só toca se tiver controlador
+                    if (portraitAnimator != null && portraitAnimator.runtimeAnimatorController != null) 
+                    {
+                        portraitAnimator.Play(tagValue);
+                    }
                     break;
             }
         }
@@ -194,25 +163,13 @@ public class DialogueManager : MonoBehaviour
     private void ExitDialogue()
     {
         dialoguePlaying = false;
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (dialogueText != null) dialogueText.text = "";
 
-        // inform other parts of our system that we've finished dialogue
+        // Desliga seus scripts para evitar erro
+        if (inkExternalFunctions != null) inkExternalFunctions.Unbind(story);
+        if (inkDialogueVariables != null) inkDialogueVariables.StopListening(story);
+
         GameEventsManager.instance.dialogueEvents.DialogueFinished();
-
-        // let player move again
-        GameEventsManager.instance.playerEvents.EnablePlayerMovement();
-
-        // input event context
-        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
-
-        // stop listening for dialogue variables
-        inkDialogueVariables.StopListening(story);
-
-        // reset story state
-        story.ResetState();
-    }
-
-    private bool IsLineBlank(string dialogueLine)
-    {
-        return dialogueLine.Trim().Equals("") || dialogueLine.Trim().Equals("\n");
     }
 }
