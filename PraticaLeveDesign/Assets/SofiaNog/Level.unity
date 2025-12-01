@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -542663604748664575, guid: 134b8b614639ed147a97f363f8028826, type: 3}
+    - target: {fileID: 2126596519291753209, guid: 073372f0f14ce814aa45bf21c04e7372, type: 3}
+      propertyPath: m_Radius
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2298721313907048613, guid: 073372f0f14ce814aa45bf21c04e7372, type: 3}
       propertyPath: m_Name
       value: QuestPoint
@@ -280,8 +284,8 @@ Canvas:
   m_GameObject: {fileID: 217428150}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 579208495}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -502,6 +506,7 @@ GameObject:
   - component: {fileID: 494956212}
   - component: {fileID: 494956214}
   - component: {fileID: 494956213}
+  - component: {fileID: 494956215}
   m_Layer: 5
   m_Name: PainelDialogo
   m_TagString: Untagged
@@ -518,7 +523,7 @@ RectTransform:
   m_GameObject: {fileID: 494956211}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.006, y: 0.0035, z: 0.02}
+  m_LocalScale: {x: 0.45, y: 0.2, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 960999629}
@@ -528,7 +533,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -397.257, y: -164.871}
+  m_AnchoredPosition: {x: -3.2000122, y: -104.899994}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &494956213
@@ -569,6 +574,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 494956211}
   m_CullTransparentMesh: 1
+--- !u!114 &494956215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494956211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1387044ad6c72ec4a99a3e002aac52f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialoguePanelUI
+  panel: {fileID: 494956211}
 --- !u!1 &579208493
 GameObject:
   m_ObjectHideFlags: 0
@@ -14017,7 +14035,6 @@ GameObject:
   - component: {fileID: 1710518833}
   - component: {fileID: 1710518836}
   - component: {fileID: 1710518835}
-  - component: {fileID: 1710518834}
   m_Layer: 5
   m_Name: ImagemRetrato
   m_TagString: Untagged
@@ -14044,28 +14061,6 @@ RectTransform:
   m_AnchoredPosition: {x: -311, y: 16}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &1710518834
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1710518832}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1710518835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26399,10 +26394,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
   inkJson: {fileID: 4900000, guid: 37f049c8e4e706141ab8aa37c7adc374, type: 3}
-  dialoguePanel: {fileID: 494956211}
-  dialogueText: {fileID: 960999630}
-  displayNameText: {fileID: 1768501195}
-  portraitAnimator: {fileID: 1710518834}
 --- !u!1 &2046279771
 GameObject:
   m_ObjectHideFlags: 0
