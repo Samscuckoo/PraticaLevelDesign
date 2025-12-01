@@ -6,12 +6,12 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
     [Header("Config")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] public float moveSpeed = 5f;
 
-    private Rigidbody2D rb;
-    private Vector2 velocity = Vector2.zero;
-    private Animator animator;
-    private SpriteRenderer visual;
+    public Rigidbody2D rb;
+    public Vector2 velocity = Vector2.zero;
+    public Animator animator;
+    public SpriteRenderer visual;
 
     private bool movementDisabled = false;
 

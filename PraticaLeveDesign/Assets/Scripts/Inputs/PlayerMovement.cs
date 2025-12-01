@@ -3,10 +3,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
-    private Rigidbody2D rb;
-    private Vector2 moveInput;
-    private Animator animator;
+    [SerializeField] public float moveSpeed = 5f;
+    public Rigidbody2D rb;
+    public Vector2 moveInput;
+    public Animator animator;
 
     // torna visível no Inspector para debug
     [SerializeField] private bool movementEnabled = true;
