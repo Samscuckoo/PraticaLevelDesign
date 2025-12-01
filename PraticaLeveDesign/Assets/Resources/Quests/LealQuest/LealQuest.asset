@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85f706d957788094483ecab10570cd1b, type: 3}
-  m_Name: QuestLeal
+  m_Name: LealQuest
   m_EditorClassIdentifier: Assembly-CSharp::QuestInfoSO
   <id>k__BackingField: QuestLeal
   displayName: "Esse Nome N\xE3o Importa"
